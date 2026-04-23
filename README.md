@@ -8,51 +8,79 @@ Repositorio con skills personales de Claude Code para análisis de problemas de 
 
 ## Instalación en un PC nuevo
 
-Las skills de Claude Code se cargan desde `~/.claude/skills/`. Para que este repo se active, cada skill tiene que estar accesible desde ahí.
+Claude Code carga skills desde `~/.claude/skills/`. Para dejarlas disponibles desde este repo hay tres caminos; **se recomienda la Opción A** por su simplicidad y porque incluye actualización en un solo comando.
 
-### Opción A — Copia simple (recomendada si actualizas poco)
+### Opción A — `npx skills` (recomendada)
+
+Usa el CLI [`skills`](https://github.com/vercel-labs/skills) de Vercel Labs. Requiere Node.js instalado (viene con Claude Code si lo instalaste por npm).
 
 ```bash
-git clone git@github.com:<tu-usuario>/Problemas.git ~/Projects/Problemas
-cp -r ~/Projects/Problemas/skills/descubrimiento-modulo ~/.claude/skills/
+npx skills add sazf/Problemas -g --agent claude-code -y
 ```
 
-Cada vez que hagas `git pull`, repite el `cp -r` para propagar los cambios.
+Eso clona el repo, detecta la skill y la monta en `~/.claude/skills/descubrimiento-modulo/` (por defecto como symlink). No hay que elegir carpeta ni recordar rutas.
 
-### Opción B — Symlink (sin duplicar; recomendado si editas a menudo)
+Comandos útiles:
 
 ```bash
-git clone git@github.com:<tu-usuario>/Problemas.git ~/Projects/Problemas
+npx skills ls -g                                   # listar instaladas
+npx skills update descubrimiento-modulo -g         # actualizar a última versión del repo
+npx skills remove descubrimiento-modulo -g -y      # desinstalar
+```
+
+Si algún día cambias de agente, el mismo repo sirve para otros (`--agent cursor`, `--agent codex`, etc.).
+
+### Opción B — Git + symlink (fallback, sin dependencia de npx)
+
+Útil si prefieres no depender de una herramienta de terceros, o si vas a editar la skill a menudo en tu repo clonado.
+
+```bash
+mkdir -p ~/Projects && cd ~/Projects
+git clone https://github.com/sazf/Problemas.git
+mkdir -p ~/.claude/skills
 ln -s ~/Projects/Problemas/skills/descubrimiento-modulo ~/.claude/skills/descubrimiento-modulo
 ```
 
-Así los cambios en el repo se reflejan al instante en Claude Code y viceversa.
+Los cambios en el repo se reflejan al instante en Claude Code.
+
+### Opción C — Git + copia (la más manual)
+
+```bash
+mkdir -p ~/Projects && cd ~/Projects
+git clone https://github.com/sazf/Problemas.git
+mkdir -p ~/.claude/skills
+cp -r Problemas/skills/descubrimiento-modulo ~/.claude/skills/
+```
+
+Es la más simple conceptualmente pero obliga a repetir el `cp -r` tras cada `git pull`, y si editas en `~/.claude/skills/` en vez de en el repo, pierdes los cambios al siguiente copy.
 
 ### Verificación
 
-Abre una sesión de Claude Code y ejecuta cualquier prompt que dispare la skill (p. ej. *"quiero hacer un análisis de descubrimiento del módulo de inventario"*). La skill `descubrimiento-modulo` debe aparecer en la lista de skills disponibles.
+Abre una sesión de Claude Code y lanza un prompt de prueba:
+
+> "Quiero hacer un análisis de descubrimiento del módulo de inventario."
+
+La skill `descubrimiento-modulo` debe activarse sola y comenzar por el Paso 1 del pipeline (capturar intención).
 
 ## Actualizar la skill
 
-El flujo depende de la opción de instalación:
+Editas siempre dentro del repo, nunca directo en `~/.claude/skills/`. Luego:
 
-### Si usaste copia (Opción A)
+| Instalada con | Propagar cambios |
+|---|---|
+| Opción A (`npx skills`) | `npx skills update descubrimiento-modulo -g` |
+| Opción B (symlink) | `git pull` (ya está; el symlink apunta al repo) |
+| Opción C (copia) | `git pull && cp -r skills/descubrimiento-modulo ~/.claude/skills/` |
 
-1. Edita los archivos bajo `skills/descubrimiento-modulo/` **en este repo**.
-2. Commit y push.
-3. En cada PC donde esté instalada, traer los cambios:
-   ```bash
-   cd ~/Projects/Problemas && git pull
-   cp -r skills/descubrimiento-modulo ~/.claude/skills/
-   ```
+Flujo de autor (la máquina donde editas):
 
-Importante: si alguna vez editas directo en `~/.claude/skills/descubrimiento-modulo/` en vez de en el repo, **perderás** los cambios al siguiente `cp -r`. Regla simple: edita siempre en el repo.
-
-### Si usaste symlink (Opción B)
-
-1. Edita los archivos bajo `skills/descubrimiento-modulo/` en este repo (o desde `~/.claude/skills/descubrimiento-modulo/`, ambos apuntan al mismo sitio).
-2. Commit y push.
-3. En cada PC: `git pull` y listo, no hay paso de copia.
+```bash
+cd ~/Projects/Problemas
+# edita skills/descubrimiento-modulo/...
+git add skills/
+git commit -m "..."
+git push
+```
 
 ## Estructura de la skill
 
