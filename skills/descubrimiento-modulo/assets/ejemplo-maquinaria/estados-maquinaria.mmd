@@ -1,0 +1,18 @@
+stateDiagram-v2
+    [*] --> borrador
+    borrador --> disponible : activar [ficha completa + SOAT/rev vigentes]
+    disponible --> asignada : asignar [no hay solape de fechas]
+    asignada --> en_traslado : despachar
+    en_traslado --> operando : llegada_a_obra
+    operando --> detenida : pausar
+    detenida --> operando : reanudar
+    operando --> en_mantenimiento : reportar_falla
+    detenida --> en_mantenimiento : programar_preventivo
+    disponible --> en_mantenimiento : programar_preventivo
+    en_mantenimiento --> disponible : cerrar_mantenimiento [pruebas OK]
+    operando --> alquilada : iniciar_alquiler [contrato firmado]
+    alquilada --> disponible : cerrar_alquiler [lectura final + liquidación]
+    disponible --> fuera_de_servicio : retirar
+    fuera_de_servicio --> disponible : reincorporar
+    fuera_de_servicio --> dada_de_baja : dar_de_baja [rol gerencia]
+    dada_de_baja --> [*]

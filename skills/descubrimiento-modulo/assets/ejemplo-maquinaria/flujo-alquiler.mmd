@@ -1,0 +1,26 @@
+flowchart TD
+    A[Solicitud de alquiler recibida] --> B{Máquina disponible<br/>en fechas?}
+    B -->|No| B1[Ofrecer alternativa o<br/>lista de espera]
+    B1 --> Z[Fin]
+    B -->|Sí| C[Generar cotización<br/>con tarifa + AIU si aplica]
+    C --> D{Cliente aprueba?}
+    D -->|No| Z
+    D -->|Sí| E[Firmar contrato de alquiler<br/>física o electrónicamente]
+    E --> F{Operario incluido?}
+    F -->|Sí| G[Verificar SST del operario<br/>EPS/ARL/AFP vigentes]
+    F -->|No| H[Continuar sin operario]
+    G --> G1{SST al día?}
+    G1 -->|No| G2[Bloquear: no despachar<br/>hasta actualizar SST]
+    G2 --> Z
+    G1 -->|Sí| H
+    H --> I[Despachar: transición<br/>asignada → en_traslado]
+    I --> J[Lectura inicial de horómetro<br/>+ checklist de entrega]
+    J --> K[Alquiler activo<br/>estado: alquilada]
+    K --> L{Evento durante alquiler}
+    L -->|Falla| M[Reportar falla →<br/>en_mantenimiento]
+    M --> K
+    L -->|Fin de periodo| N[Lectura final de horómetro]
+    N --> O[Liquidar: tarifa base +<br/>horas extra + combustible<br/>+ traslado]
+    O --> P[Emitir factura electrónica DIAN<br/>con retenciones aplicables]
+    P --> Q[Cerrar alquiler<br/>estado: disponible]
+    Q --> Z
